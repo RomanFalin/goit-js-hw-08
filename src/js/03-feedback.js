@@ -4,28 +4,40 @@ const form = document.querySelector("form");
 
 form.addEventListener("input", throttle(onFormAction, 500));
 form.addEventListener("submit", submitForm);
-window.onload = checkForm;
+window.onload = checkForm();
 
 const onFormData = {};
 
 function onFormAction(evt) {
     onFormData[evt.target.name] = evt.target.value;
-    localStorage.setItem("feedback-form-state", JSON.stringify(onFormData));
-    console.log(localStorage.getItem("feedback-form-state"));
+    localStorage.setItem('feedback-form-state', JSON.stringify(onFormData));
 }
 
 function submitForm(evt) {
     evt.preventDefault();
-    console.log(JSON.parse(localStorage.getItem("feedback-form-state")));
+    
+    const {elements: { email, message }, } = evt.currentTarget;
+    
+    if (email.value === '' || message.value === '') {
+        return alert('Please fill in all the fields!');
+    }
+    
+    console.log({ email: email.value, message: message.value });
     evt.currentTarget.reset();
 }
 
 function checkForm() {
-    const data = JSON.parse(localStorage.getItem('feedback-form-state'));
-    const email = document.querySelector('[name="email"]');
-    const message = document.querySelector('[name="message"]');
-    if (data) {
-        email.value = data.email;
-        message.value = data.message;
-  }
+    const savedData = localStorage.getItem('feedback-form-state');
+    
+    if (savedData) {
+        console.log(savedData);
+        
+        try {
+            const savedDataParsed = JSON.parse(savedData);
+            Object.keys(savedDataParsed).forEach(key => (form[key].value = savedDataParsed[key]));
+        } catch (error) {
+            console.log(error.email);
+            console.log(error.message);
+        }
+    }
 }
