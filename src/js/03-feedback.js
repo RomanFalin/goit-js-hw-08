@@ -9,8 +9,9 @@ window.onload = checkForm();
 const onFormData = {};
 
 function onFormAction(evt) {
-    onFormData[evt.target.name] = evt.target.value;
-    localStorage.setItem('feedback-form-state', JSON.stringify(onFormData));
+    const onFormData = new FormData(form);
+    const onFormDataJSON = JSON.stringify(Object.fromEntries(onFormData));
+    localStorage.setItem('feedback-form-state', onFormDataJSON);
 }
 
 function submitForm(evt) {
@@ -24,14 +25,13 @@ function submitForm(evt) {
     
     console.log({ email: email.value, message: message.value });
     evt.currentTarget.reset();
+    localStorage.removeItem('feedback-form-state');
 }
 
 function checkForm() {
     const savedData = localStorage.getItem('feedback-form-state');
     
     if (savedData) {
-        console.log(savedData);
-        
         try {
             const savedDataParsed = JSON.parse(savedData);
             Object.keys(savedDataParsed).forEach(key => (form[key].value = savedDataParsed[key]));
